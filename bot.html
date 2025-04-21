@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA HEALTH ASSISTANT</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+    <style>
+        :root {
+            --primary-color: #2C6ECB;
+            --secondary-color: #6BB5FF;
+            --accent-color: #FF6B8B;
+            --light-bg: #F7FAFF;
+            --dark-text: #333333;
+            --light-text: #FFFFFF;
+            --card-shadow: 0 8px 30px rgba(44, 110, 203, 0.12);
+            --gradient: linear-gradient(135deg, #2C6ECB, #6BB5FF);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: var(--gradient);
+            color: var(--light-text);
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        
+        .logo-icon {
+            font-size: 1.8rem;
+            color: var(--light-text);
+        }
+        
+        .tagline {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            height: 70vh;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .chat-header {
+            background: var(--gradient);
+            color: var(--light-text);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .assistant-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--light-text);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .assistant-info {
+            flex: 1;
+        }
+        
+        .assistant-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .status {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ADE80;
+            display: inline-block;
+        }
+        
+        .webchat-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        #webchat {
+            height: 100%;
+            width: 100%;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(44, 110, 203, 0.18);
+        }
+        
+        .feature-icon {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-text);
+        }
+        
+        .feature-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .footer {
+            background: #EAEEF6;
+            padding: 1rem;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 2rem;
+        }
+        
+        /* Custom webchat styling will be applied via styleOptions */
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .chat-container {
+                height: 60vh;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-heartbeat logo-icon"></i>
+                NOVA HEALTH ASSISTANT
+            </div>
+            <div class="tagline">Your personal AI healthcare companion</div>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="chat-container fade-in">
+            <div class="chat-header">
+                <div class="assistant-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="assistant-info">
+                    <div class="assistant-name">NOVA Health Assistant</div>
+                    <div class="status">
+                        <span class="status-indicator"></span>
+                        Online
+                    </div>
+                </div>
+            </div>
+            <div class="webchat-container">
+                <div id="webchat" role="main"></div>
+            </div>
+        </div>
+        
+        <div class="features">
+            <div class="feature-card fade-in delay-1">
+                <div class="feature-icon"><i class="fas fa-stethoscope"></i></div>
+                <h3 class="feature-title">Health Guidance</h3>
+                <p class="feature-desc">Get personalized health information and guidance from our AI-powered assistant.</p>
+            </div>
+            
+            <div class="feature-card fade-in delay-2">
+                <div class="feature-icon"><i class="fas fa-pills"></i></div>
+                <h3 class="feature-title">Medication Reminders</h3>
+                <p class="feature-desc">Set up medication reminders and get information about your prescriptions.</p>
+            </div>
+            
+            <div class="feature-card fade-in delay-3">
+                <div class="feature-icon"><i class="fas fa-calendar-check"></i></div>
+                <h3 class="feature-title">Appointment Scheduling</h3>
+                <p class="feature-desc">Schedule appointments and get reminders for your healthcare needs.</p>
+            </div>
+            
+            <div class="feature-card fade-in delay-4">
+                <div class="feature-icon"><i class="fas fa-file-medical"></i></div>
+                <h3 class="feature-title">Health Records</h3>
+                <p class="feature-desc">Keep track of your health records and medical history in one secure place.</p>
+            </div>
+        </div>
+    </div>
+    
+    <footer class="footer">
+        © 2025 NOVA Health Assistant. All rights reserved.
+    </footer>
+
+    <script>
+        const webChatSecret = "6N4fw9DLrOM._mN1vcztVRUGjbT6El5b3ffeG57D84E_JhMvhDevOBk";
+        
+        // Intercept and modify messages from the bot
+        const store = window.WebChat.createStore({}, ({ dispatch }) => next => action => {
+            if (action.type === 'DIRECT_LINE/INCOMING_ACTIVITY' && action.payload.activity.text) {
+                // Replace any instance of 'AYUSH HEALTH CARE CHAT BOT' with 'NOVA HEALTH ASSISTANT'
+                action.payload.activity.text = action.payload.activity.text
+                    .replace(/AYUSH HEALTH CARE CHAT BOT/gi, 'NOVA HEALTH ASSISTANT')
+                    .replace(/AYUSH/gi, 'NOVA');
+            }
+            return next(action);
+        });
+        
+        // Rendering the WebChat with enhanced styling
+        window.WebChat.renderWebChat(
+            {
+                directLine: window.WebChat.createDirectLine({ token: webChatSecret }),
+                userID: 'user',
+                username: 'You',
+                locale: 'en-US',
+                store: store,
+                styleOptions: {
+                    // Avatar customization
+                    botAvatarInitials: 'N',
+                    userAvatarInitials: 'U',
+                    botAvatarBackgroundColor: '#2C6ECB',
+                    userAvatarBackgroundColor: '#FF6B8B',
+                    
+                    // Bubble styling
+                    bubbleBackground: '#F0F4FF',
+                    bubbleBorderRadius: 12,
+                    bubbleFromUserBackground: '#F0FFF4',
+                    bubbleFromUserBorderRadius: 12,
+                    bubbleBorderWidth: 0,
+                    
+                    // Typography
+                    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+                    
+                    // Colors
+                    accent: '#2C6ECB',
+                    backgroundColor: '#FFFFFF',
+                    
+                    // Timestamps and subtle content
+                    timestampColor: '#8A8A8A',
+                    subtle: '#8A8A8A',
+                    
+                    // General spacing and layout
+                    bubbleMinWidth: 200,
+                    bubbleMaxWidth: 400,
+                    rootHeight: '100%',
+                    rootWidth: '100%',
+                    
+                    // Send box styling
+                    sendBoxBackground: '#F7FAFF',
+                    sendBoxBorderBottom: '1px solid #E1E9F5',
+                    sendBoxBorderLeft: '1px solid #E1E9F5',
+                    sendBoxBorderRight: '1px solid #E1E9F5',
+                    sendBoxBorderTop: '1px solid #E1E9F5',
+                    sendBoxButtonColor: '#2C6ECB',
+                    sendBoxHeight: 50,
+                    sendBoxTextWrap: true,
+                    
+                    // Animation
+                    hideScrollToEndButton: false,
+                    
+                    // Overall layout
+                    groupTimestamp: true,
+                    showAvatarInGroup: true
+                }
+            },
+            document.getElementById('webchat')
+        );
+        
+        // Animation for elements when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            const fadeElements = document.querySelectorAll('.fade-in');
+            fadeElements.forEach(element => {
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>
